@@ -11,50 +11,41 @@ import java.util.List;
 import br.edu.utfpr.dv.sireata.model.AtaParticipante;
 
 public class AtaParticipanteDAO {
+	Connection conn = null;
+	Statement stmt = null;
+	ResultSet rs = null;
 	
 	public AtaParticipante buscarPorId(int id) throws SQLException{
-		Connection conn = null;
-		PreparedStatement stmt = null;
-		ResultSet rs = null;
-		
-		try{
+		try(
 			conn = ConnectionDAO.getInstance().getConnection();
 			stmt = conn.prepareStatement("SELECT ataparticipantes.*, usuarios.nome AS nomeParticipante FROM ataparticipantes " +
 				"INNER JOIN usuarios ON usuarios.idUsuario=ataparticipantes.idUsuario " +
 				"WHERE idAtaParticipante = ?");
-		
+		){
 			stmt.setInt(1, id);
 			
-			rs = stmt.executeQuery();
-			
-			if(rs.next()){
-				return this.carregarObjeto(rs);
-			}else{
-				return null;
+			try(rs = stmt.executeQuery();) {
+				if(rs.next()){
+					return this.carregarObjeto(rs);
+				}else{
+					return null;
+				}
+			}catch(Exception e){
+				System.out.println(e)
 			}
-		}finally{
-			if((rs != null) && !rs.isClosed())
-				rs.close();
-			if((stmt != null) && !stmt.isClosed())
-				stmt.close();
-			if((conn != null) && !conn.isClosed())
-				conn.close();
+		}catch(Exception e){
+			System.out.println(e)
 		}
 	}
 	
 	public List<AtaParticipante> listarPorAta(int idAta) throws SQLException{
-		Connection conn = null;
-		Statement stmt = null;
-		ResultSet rs = null;
-		
-		try{
+		try(
 			conn = ConnectionDAO.getInstance().getConnection();
 			stmt = conn.createStatement();
-		
 			rs = stmt.executeQuery("SELECT ataparticipantes.*, usuarios.nome AS nomeParticipante FROM ataparticipantes " +
 				"INNER JOIN usuarios ON usuarios.idUsuario=ataparticipantes.idUsuario " + 
 				"WHERE idAta=" + String.valueOf(idAta) + " ORDER BY usuarios.nome");
-		
+		){
 			List<AtaParticipante> list = new ArrayList<AtaParticipante>();
 			
 			while(rs.next()){
@@ -62,31 +53,23 @@ public class AtaParticipanteDAO {
 			}
 			
 			return list;
-		}finally{
-			if((rs != null) && !rs.isClosed())
-				rs.close();
-			if((stmt != null) && !stmt.isClosed())
-				stmt.close();
-			if((conn != null) && !conn.isClosed())
-				conn.close();
+		}catch(Exception e){
+			System.out.println(e)
 		}
 	}
 	
 	public int salvar(AtaParticipante participante) throws SQLException{
 		boolean insert = (participante.getIdAtaParticipante() == 0);
-		Connection conn = null;
-		PreparedStatement stmt = null;
-		ResultSet rs = null;
-		
-		try{
+
+		try(
 			conn = ConnectionDAO.getInstance().getConnection();
-		
+
 			if(insert){
 				stmt = conn.prepareStatement("INSERT INTO ataparticipantes(idAta, idUsuario, presente, motivo, designacao, membro) VALUES(?, ?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
 			}else{
 				stmt = conn.prepareStatement("UPDATE ataparticipantes SET idAta=?, idUsuario=?, presente=?, motivo=?, designacao=?, membro=? WHERE idAtaParticipante=?");
 			}
-			
+		){
 			stmt.setInt(1, participante.getAta().getIdAta());
 			stmt.setInt(2, participante.getParticipante().getIdUsuario());
 			stmt.setInt(3, (participante.isPresente() ? 1 : 0));
@@ -101,38 +84,30 @@ public class AtaParticipanteDAO {
 			stmt.execute();
 			
 			if(insert){
-				rs = stmt.getGeneratedKeys();
 				
-				if(rs.next()){
-					participante.setIdAtaParticipante(rs.getInt(1));
+				try(rs = stmt.getGeneratedKeys();) {
+					if(rs.next()){
+						participante.setIdAtaParticipante(rs.getInt(1));
+					}
+				}catch(Exception e){
+					System.out.println(e)
 				}
 			}
 			
 			return participante.getIdAtaParticipante();
-		}finally{
-			if((rs != null) && !rs.isClosed())
-				rs.close();
-			if((stmt != null) && !stmt.isClosed())
-				stmt.close();
-			if((conn != null) && !conn.isClosed())
-				conn.close();
+		}catch(Exception e){
+			System.out.println(e)
 		}
 	}
 	
-	public void excluir(int id) throws SQLException{
-		Connection conn = null;
-		Statement stmt = null;
-		
-		try{
+	public void excluir(int id) throws SQLException{		
+		try(
 			conn = ConnectionDAO.getInstance().getConnection();
 			stmt = conn.createStatement();
-		
+		){
 			stmt.execute("DELETE FROM ataparticipantes WHERE idAtaParticipante=" + String.valueOf(id));
-		}finally{
-			if((stmt != null) && !stmt.isClosed())
-				stmt.close();
-			if((conn != null) && !conn.isClosed())
-				conn.close();
+		}catch(Exception e){
+			System.out.println(e)
 		}
 	}
 	
