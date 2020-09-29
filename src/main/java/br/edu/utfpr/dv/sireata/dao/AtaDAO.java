@@ -16,6 +16,7 @@ import br.edu.utfpr.dv.sireata.util.DateUtils;
 
 public class AtaDAO implements CRUD_DAO<Ata> {
 	
+	@Override
 	public Ata buscarPorId(int id) throws SQLException{
 		Connection conn = null;
 		PreparedStatement stmt = null;
@@ -460,6 +461,7 @@ public class AtaDAO implements CRUD_DAO<Ata> {
 		}
 	}
 	
+	@Override
 	public int salvar(Ata ata) throws SQLException{
 		boolean insert = (ata.getIdAta() == 0);
 		Connection conn = null;
@@ -698,6 +700,7 @@ public class AtaDAO implements CRUD_DAO<Ata> {
 		}
 	}
 	
+	@Override
 	public boolean excluir(int idAta) throws SQLException{
 		Connection conn = null;
 		Statement stmt = null;

@@ -70,6 +70,7 @@ public class CampusDAO implements ListAll<Campus>{
 		}
 	}
 	
+	@Override
 	public List<Campus> listarTodos(boolean apenasAtivos) throws SQLException{
 		Connection conn = null;
 		Statement stmt = null;
