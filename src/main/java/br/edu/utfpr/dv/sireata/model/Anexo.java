@@ -1,11 +1,20 @@
 package br.edu.utfpr.dv.sireata.model;
 
+import javax.persistence.*;
+
+@Entity // Define que esta classe é uma entidade a ser mapeada
+@Table(name = "anexo") // Define o nome desta tabela para o banco de dados
 public class Anexo {
 	
+	@Id // Normalmente define qual é a primary key das tabelas
 	private int idAnexo;
+	@Column(name = "ata") // Informa o nome da coluna e o tipo de dado, os quais serão enviados para o banco de dados
 	private Ata ata;
+	@Column(name = "ordem")
 	private int ordem;
+	@Column(name = "descricao")
 	private String descricao;
+	@Column(name = "arquivo")
 	private byte[] arquivo;
 	
 	public Anexo() {
